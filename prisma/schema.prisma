@@ -9,3 +9,49 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String
+  name      String
+  profile   Profile?
+  questions Question[]
+  answers   Answer[]
+}
+
+model Profile {
+  id       Int     @id @default(autoincrement())
+  photoUrl String?
+  about    String?
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId   Int     @unique
+}
+
+model Question {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  published   DateTime  @default(now())
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    Int
+  answers     Answer[]
+  Community   Community @relation(fields: [communityId], references: [id])
+  communityId Int
+}
+
+model Answer {
+  id         Int      @id @default(autoincrement())
+  content    String
+  published  DateTime @default(now())
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   Int
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+}
+
+model Community {
+  id        Int        @id @default(autoincrement())
+  name      String
+  questions Question[]
+}
